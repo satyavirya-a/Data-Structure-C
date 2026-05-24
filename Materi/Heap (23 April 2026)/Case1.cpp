@@ -30,7 +30,7 @@ void swap(Data *a, Data *b ) {
 
 
 void insert(MaxHeap* heap, Data source) {
-	if(heap->size > MAX_HEAP_SIZE) {
+	if(heap->size >= MAX_HEAP_SIZE) {
 		printf("Heap overflow\n");
 		return;
 	}
@@ -47,21 +47,21 @@ void insert(MaxHeap* heap, Data source) {
 
 void heapify(MaxHeap* heap, int idx) {
 	//definisiin dulu variabel nya
-	int smallestIdx = idx;
+	int maxIdx = idx;
 	int leftChildIdx = idx*2 + 1;
 	int rightChildIdx = idx*2 + 2;
 	
-	if (leftChildIdx < heap->size && heap->elements[leftChildIdx].poligon > heap->elements[smallestIdx].poligon) {
-		smallestIdx = leftChildIdx;
+	if (leftChildIdx < heap->size && heap->elements[leftChildIdx].poligon > heap->elements[maxIdx].poligon) {
+		maxIdx = leftChildIdx;
 	}
 	
-	if (rightChildIdx < heap->size && heap->elements[rightChildIdx].poligon > heap->elements[smallestIdx].poligon) {
-		smallestIdx = rightChildIdx;
+	if (rightChildIdx < heap->size && heap->elements[rightChildIdx].poligon > heap->elements[maxIdx].poligon) {
+		maxIdx = rightChildIdx;
 	}
 	
-	if (smallestIdx != idx) {
-		swap(&heap->elements[idx], &heap->elements[smallestIdx]);
-		heapify(heap, smallestIdx);
+	if (maxIdx != idx) {
+		swap(&heap->elements[idx], &heap->elements[maxIdx]);
+		heapify(heap, maxIdx);
 	}
 }
 
@@ -105,8 +105,6 @@ int main() {
 	scanf("%s", line);
 	scanf("%d", &q);
 	
-	char name[100];
-	int key;
 	char* data = strtok(line, ",");
 	int i = 0;
 	
@@ -115,7 +113,7 @@ int main() {
 //		printf("%s\n", data);
 		Data temp;
 		sscanf(data,"%[^-]-%d", temp.name, &temp.poligon);
-		printf("%s %d\n", temp.name, temp.poligon);
+//		printf("%s %d\n", temp.name, temp.poligon);
 		insert(heap, temp);
 		i++;
 		data = strtok(NULL, ",");
@@ -130,7 +128,12 @@ int main() {
 	}
 	
 	printf("[REMAINING] ");
-	display(heap);
+	if (heap->size == 0) {
+		printf("GPU Idle\n");
+	}
+	else {	
+		display(heap);
+	}
 	
 	return 0;
 }

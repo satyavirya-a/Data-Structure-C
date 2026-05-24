@@ -205,7 +205,7 @@ void bubbleDown(MinMaxHeap* heap, int idx) {
 		return;
 	}
 	
-	if (isMinLevel(idx)) {
+	if (isMinLevel(idx)) {//genap
 		
 		int m = findMinDescendantIdx(heap, idx);
 		if (m != idx) {
@@ -213,11 +213,11 @@ void bubbleDown(MinMaxHeap* heap, int idx) {
 			
 			if (parentIdx(m) != idx) {
 				int p = parentIdx(m);
-				if (heap->elements[m].score < heap->elements[p].score) {
+				if (heap->elements[m].score > heap->elements[p].score) { //karena ini min level, parent itu max level, makanya harus lebih besar dulu baru bisa swap
 					swap(&heap->elements[m], &heap->elements[p]);
 				}
+				bubbleDown(heap, m);
 			}
-			bubbleDown(heap, m);
 		}
 	}
 	
@@ -230,11 +230,11 @@ void bubbleDown(MinMaxHeap* heap, int idx) {
 			//kalau parent dari descendant itu bukan idx -> dia grandchild
 			if (parentIdx(m) != idx) {
 				int p = parentIdx(m); //cek lagi dengan parent nya apakah sudah sesuai
-				if (heap->elements[m].score > heap->elements[p].score) {
+				if (heap->elements[m].score < heap->elements[p].score) {
 					swap(&heap->elements[m], &heap->elements[p]);
 				}
+				bubbleDown(heap,m); // rekursi ke tempat tadi ngambil value terbesar
 			}
-			bubbleDown(heap,m); // rekursi ke tempat tadi ngambil value terbesar
 		}
 	}
 }
@@ -253,7 +253,6 @@ void insert(MinMaxHeap* heap, Data key) {
 Data deleteMin(MinMaxHeap* heap) {
 	Data temp = {0};
 	if (heap->size == 0) {
-		printf("Heap Kososng\n");
 		return temp;
 	}
 	
@@ -273,7 +272,6 @@ Data deleteMin(MinMaxHeap* heap) {
 Data deleteMax(MinMaxHeap* heap) {
 	Data temp = {0};
 	if (heap->size == 0 ) {
-		printf("Heap Kosong\n");
 		return temp;
 	}
 	
@@ -320,10 +318,11 @@ int main() {
 	
 	char line[100] = {0};
 	do {
-		scanf("%[^\n]", line);
+		scanf(" %[^\n]", line);
 //		printf("line sebelum strtok %s\n", line);
-		getchar();
-		char * command = strtok(line, " "); // PING DS01 64
+//		getchar(); kalau kaga pake getchar kasih spasi dibelakang scanf
+		char * command = strtok(line, " "); 
+		if (command == NULL) continue; //jaga jaga kalau langsung spasi wak
 		if (strcmp(command, "PING") == 0) {
 			Data temp;
 			char* ID = strtok(NULL, " ");
@@ -337,11 +336,17 @@ int main() {
 		}
 		
 		else if (strcmp(command, "DIVERT_SURPLUS") == 0) {
+			if (heap->size == 0) {
+				continue;
+			}
 			Data temp = deleteMax(heap);
 			printf("[LOGISTIC] Diverting surplus from Region %s (Score: %d)\n", temp.ID, temp.score);
 		}
 		
 		else if (strcmp(command, "DISPATCH_SOS") == 0) {
+			if (heap->size == 0) {
+				continue;
+			}
 			Data temp = deleteMin(heap);
 			printf("[EMERGENCY] Routing aid to Region %s (Score: %d)\n", temp.ID, temp.score);
 		}
